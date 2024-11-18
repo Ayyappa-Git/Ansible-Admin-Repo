@@ -1,0 +1,35 @@
+---
+- name: Playbook to Restart the Service based the condition of Service Runtime
+  hosts: localhost
+  tasks:
+    - name: Get the active time of the sshd service
+      command: systemctl show sshd --property=ActiveEnterTimestamp
+      register: sshd_active_time_raw
+
+    - name: Parse the ActiveEnterTimestamp
+      set_fact:
+        sshd_active_time: "{{ sshd_active_time_raw.stdout.split('=')[1] | trim }}"
+
+    - name: Calculate the uptime in seconds
+      shell: |
+        echo $(( $(date +%s) - $(date -d '{{ sshd_active_time }}' +%s) ))
+      register: sshd_uptime_seconds
+      changed_when: false
+
+    - name: Convert uptime to minutes
+      set_fact:
+        sshd_uptime_minutes: "{{ sshd_uptime_seconds.stdout | int // 60 | round(2) }}"
+
+    - name: Display SSHD service uptime in minutes
+      debug:
+        msg: "SSHD service uptime is {{ sshd_uptime_minutes }} minutes"
+    - name: Restart The Service when Service Runtime is Greater Than 10 Minutes
+      service:
+        name: sshd
+        state: restarted
+      when: sshd_uptime_minutes | float > 10
+    - name: Get the Service Status 
+      debug:
+        msg: Service is Running
+      when: ansible_facts.services['sshd.service'].state == 'running'
+
