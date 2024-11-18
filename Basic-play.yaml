@@ -1,8 +1,0 @@
----
-- name: simple playbook for git testing
-  hosts: dev
-  become: true
-  tasks:
-    - name: Print hello message
-      debug:
-        msg: "Hello"
