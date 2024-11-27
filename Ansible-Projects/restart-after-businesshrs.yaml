@@ -1,5 +1,5 @@
 ---
-- name: Restart the Nodes during out of business hours
+- name: Restart the Nodes After Business hours
   hosts: localhost
   gather_facts: false
   tasks:
@@ -15,7 +15,7 @@
       fail:
         msg: "its currently in business hours, restart aborted"
       when: "'outside_business_hours' not in time_status.stdout"
-    - name: print the below status
-      debug:
-        msg: "We are in out of business hours, good to restart the nodes"
+    - name: Restart the Nodes
+      reboot:
+        msg: "Reboot will start in 5 seconds"
       when: "'outside_business_hours' in time_status.stdout"
