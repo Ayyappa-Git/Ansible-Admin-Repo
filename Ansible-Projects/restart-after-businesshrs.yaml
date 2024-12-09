@@ -5,6 +5,7 @@
   tasks:
     - name: Check the Current Time is is Outside hours
       shell: |
+        current_hours=$(date +"%H")
         if [ "$current_hours" -lt 8 ] || [ "$current_hours" -ge 3 ];
         then
         echo "outside_business_hours"
