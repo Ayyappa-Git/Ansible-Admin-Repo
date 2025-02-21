@@ -1,0 +1,21 @@
+#Simple API connectivity Check Playbook
+---
+- name: API testing
+  hosts: localhost
+  tasks:
+    - name: test API connectivity status
+      uri:
+        url: https://simple-tool-rental-api.glitch.me/status
+        method: get
+        return_content: yes
+      register: api_status
+    - name: print the status
+      debug:
+        msg: "{{ api_status }}"
+    - name: register api status
+      set_fact:
+        api_stat: "{{ api_status.json.status }}"
+    - name: Pring the API status
+      debug:
+        msg: "API Status is {{ api_stat }} "
+      when: api_stat == "DOWN"

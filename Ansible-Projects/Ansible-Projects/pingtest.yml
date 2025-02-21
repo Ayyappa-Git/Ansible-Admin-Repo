@@ -1,0 +1,19 @@
+- name: Playbook to perform ping test
+  hosts: dev
+  gather_facts: yes
+  ignore_unreachable: true
+  tasks:
+    - name: Ping Test
+      ping:
+      register: ping_result
+      ignore_errors: true
+    - name: Print Ping Status
+      debug:
+        msg: "host is unreachable"
+      when: ping_result.unreachable is defined and  ping_result.unreachable == true
+      delegate_to: localhost
+    - name: get full log content
+      shell: cat testing.log.stdout | trim
+      register: log_content
+
+
