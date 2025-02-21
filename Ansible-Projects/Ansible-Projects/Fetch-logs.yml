@@ -1,0 +1,17 @@
+---
+- name: Fetch the 100 lines from log file
+  hosts: localhost
+  vars:
+    path: /var/log/messages
+  tasks:
+    - name: Fetch the logs
+      shell: tail -n 100 "{{ path }}"
+      register: log_output
+    - name: save output to local file
+      copy:
+        content: "{{ log_output.stdout }}"
+        dest: /tmp/fetch-log.txt
+    - name: debug to display the log output
+      debug:
+        msg: "{{ log_output.stdout_lines }}"
+

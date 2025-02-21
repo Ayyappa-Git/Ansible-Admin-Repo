@@ -1,0 +1,22 @@
+---
+- name: Restart the Nodes After Business hours
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Check the Current Time is is Outside hours
+      shell: |
+        current_hours=$(date +"%H")
+        if [ "$current_hours" -lt 8 ] || [ "$current_hours" -ge 3 ];
+        then
+        echo "outside_business_hours"
+        fi
+      register: time_status
+      changed_when: false
+    - name: fail if its with in business hours
+      fail:
+        msg: "its currently in business hours, restart aborted"
+      when: "'outside_business_hours' not in time_status.stdout"
+    - name: Restart the Nodes
+      reboot:
+        msg: "Reboot will start in 5 seconds"
+      when: "'outside_business_hours' in time_status.stdout"
